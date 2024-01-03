@@ -78,6 +78,7 @@ function spawn_wave(wave_id)
     e.y = routes[active_wave.route_id][1][2]
     e.dx = dx
     e.dy = dy
+    e.color = { love.math.colorFromBytes(generateRandomColor()) }
     table.insert(active_wave.enemies, e)
 
     dx = dx + active_wave.dx
@@ -132,7 +133,9 @@ function draw_wave()
   spr = enemy_types[active_wave.enemy_type].img
   for _, enemy in ipairs(active_wave.enemies) do
     if enemy.active then
+      love.graphics.setColor(enemy.color)
       love.graphics.draw(spr, enemy.x, enemy.y,0, 1, 1, spr:getWidth()/2, spr:getHeight()/2)
+      love.graphics.reset()
     end
   end
 end
