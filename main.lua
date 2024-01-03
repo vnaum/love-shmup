@@ -52,8 +52,8 @@ bgstars = {}
 bgstarsnum = 100
 
   -- route = (x, y, tstamp), (x, y, tstamp), ...
-  -- enemy = wave_id, hitpoints, routetime
-  -- wave = enemy_type, route_id, clock, number + tdelta + xdelta + ydelta
+  -- enemy = wave_id, clock, hitpoints, routetime
+  -- wave = enemy_type, route_id, end_clock, number + tdelta + xdelta + ydelta
   -- level = wave, wave, wave
 
 routes = {}
@@ -61,11 +61,11 @@ routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 10}, {0, 1, 10, 10}} -- '^'
 enemy_types = {}
 
 waves = {}
-waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 50, dy = 0 , dt = 0.1 }
+waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 0.1 }
 
 function spawn_wave(wave_id)
   active_wave = waves[wave_id]
-  active_wave.clock = 0
+  active_wave.end_clock = routes[active_wave.route_id][ #routes[active_wave.route_id] ] [3]
   active_wave.enemies = {}
   local dx = 0
   local dy = 0
@@ -107,19 +107,34 @@ function pos_on_route(route_id, t)
 end
 
 function update_wave(dt)
+  enemies_left = 0
   for _, enemy in ipairs(active_wave.enemies) do
     enemy.clock = enemy.clock + dt
-    enemy.x, enemy.y = pos_on_route(active_wave.route_id, enemy.clock)
+    if enemy.clock > active_wave.end_clock then
+      enemy.done = true
+    else
+      enemy.x, enemy.y = pos_on_route(active_wave.route_id, enemy.clock)
+      enemy.x = enemy.x * love.graphics.getWidth() + enemy.dx
+      enemy.y = enemy.y * love.graphics.getHeight() + enemy.dy
+    end
 
-    enemy.x = enemy.x * love.graphics.getWidth() + enemy.dx
-    enemy.y = enemy.y * love.graphics.getHeight() + enemy.dy
+    if enemy.clock < active_wave.end_clock and enemy.hp > 0 then
+      enemies_left = enemies_left + 1
+    end
+  end
+
+  -- we're done with wave 1
+  if enemies_left == 0 then
+    spawn_wave (1)
   end
 end
 
 function draw_wave()
   spr = enemy_types[active_wave.enemy_type].img
   for _, enemy in ipairs(active_wave.enemies) do
-    love.graphics.draw(spr, enemy.x, enemy.y)
+    if not enemy.done then
+      love.graphics.draw(spr, enemy.x, enemy.y,0, 1, 1, spr:getWidth()/2, spr:getHeight()/2)
+    end
   end
 end
 
