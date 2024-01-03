@@ -88,10 +88,9 @@ function love.load()
   player.y = 100
   player.sx = 0
   player.sy = 0
-  player.dir = 1
   player.color = { love.math.colorFromBytes(255, 10, 10) }
   player.cooldown_left = 0
-  player.control = { left="a", right="d", up = "w", fire = "space" }
+  player.control = { left="a", right="d", up = "w", down = "s", fire = "space" }
   player.img = love.graphics.newImage("sprites/chop1.png")
 
   table.insert(players, player)
@@ -101,10 +100,9 @@ function love.load()
   player.y = 200
   player.sx = 0
   player.sy = 0
-  player.dir = 1
   player.cooldown_left = 0
   player.color = { love.math.colorFromBytes(255, 255, 255) }
-  player.control = { left="left", right="right", up = "up", fire = "rctrl" }
+  player.control = { left="left", right="right", up = "up", down = "down", fire = "rctrl" }
   player.img = love.graphics.newImage("sprites/chop2.png")
 
   table.insert(players, player)
@@ -139,18 +137,18 @@ function love.update(dt)
   for i, player in ipairs(players) do
     if love.keyboard.isDown(player.control.left) then
       player.sx = limit(player.sx - accelx * dt, termvelx)
-      player.dir = -1
     end
 
     if love.keyboard.isDown(player.control.right) then
       player.sx = limit(player.sx + accelx * dt, termvelx)
-      player.dir = 1
     end
 
     if love.keyboard.isDown(player.control.up) then
       player.sy = limit(player.sy - accelx * dt, termvely)
-    else
-      player.sy = limit(player.sy + grav * dt, termvely)
+    end
+
+    if love.keyboard.isDown(player.control.down) then
+      player.sy = limit(player.sy + accelx * dt, termvely)
     end
 
     player.y = player.y + player.sy
@@ -162,7 +160,7 @@ function love.update(dt)
       local bullet = {}
       bullet.x = player.x
       bullet.y = player.y
-      bullet.sx = player.sx + bullet_speed_x * player.dir
+      bullet.sx = player.sx + bullet_speed_x
       bullet.sy = player.sy
       -- bullet.color = player.color
       bullet.color = { love.math.colorFromBytes(generateRandomColor()) }
@@ -200,13 +198,13 @@ function love.draw()
 
   for _, player in ipairs(players) do
     love.graphics.setColor(player.color)
-    love.graphics.draw(player.img, player.x, player.y, 0, player.dir, 1, player.img:getWidth()/2, player.img:getHeight()/2)
+    love.graphics.draw(player.img, player.x, player.y, 0, 1, 1, player.img:getWidth()/2, player.img:getHeight()/2)
     love.graphics.reset()
   end
 
   for _, bullet in ipairs(bullets) do
     love.graphics.setColor(bullet.color)
-    love.graphics.draw(bulletimg, bullet.x, bullet.y, 0, bullet.dir, 1, bulletmid, bulletmid)
+    love.graphics.draw(bulletimg, bullet.x, bullet.y, 0, 1, 1, bulletmid, bulletmid)
     love.graphics.reset()
   end
 end
