@@ -88,7 +88,7 @@ function love.load()
   player.y = 100
   player.sx = 0
   player.sy = 0
-  player.color = { love.math.colorFromBytes(255, 10, 10) }
+  player.color = { love.math.colorFromBytes(255, 100, 100) }
   player.cooldown_left = 0
   player.control = { left="a", right="d", up = "w", down = "s", fire = "space" }
   player.img = love.graphics.newImage("sprites/chop1.png")
