@@ -61,7 +61,7 @@ routes[1] = {{1, 1 , 0}, {0.5, 0, 5}, {0, 1, 10}} -- '^'
 enemy_types = {}
 
 waves = {}
-waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 1 }
+waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 50, dy = 0 , dt = 1 }
 
 function spawn_wave(wave_id)
   active_wave = waves[wave_id]
@@ -74,8 +74,10 @@ function spawn_wave(wave_id)
     local e = {}
     e.hp = enemy_types[ active_wave.enemy_type ].hp
     e.clock = dt
-    e.x = routes[active_wave.route_id][1][1] + dx
-    e.y = routes[active_wave.route_id][1][2] + dy
+    e.x = routes[active_wave.route_id][1][1]
+    e.y = routes[active_wave.route_id][1][2]
+    e.dx = dx
+    e.dy = dy
     table.insert(active_wave.enemies, e)
 
     dx = dx + active_wave.dx
@@ -84,13 +86,24 @@ function spawn_wave(wave_id)
   end
 end
 
+function pos_on_route(route_id, t)
+  return 0.5, 0.5
+end
+
 function update_wave(dt)
+  for _, enemy in ipairs(active_wave.enemies) do
+    enemy.clock = enemy.clock + dt
+    enemy.x, enemy.y = pos_on_route(active_wave.route_id, enemy.clock)
+
+    enemy.x = enemy.x * love.graphics.getWidth() + enemy.dx
+    enemy.y = enemy.y * love.graphics.getHeight() + enemy.dy
+  end
 end
 
 function draw_wave()
   spr = enemy_types[active_wave.enemy_type].img
-  for _, bullet in ipairs(active_wave.enemies) do
-    love.graphics.draw(spr, 400, 300)
+  for _, enemy in ipairs(active_wave.enemies) do
+    love.graphics.draw(spr, enemy.x, enemy.y)
   end
 end
 
