@@ -57,7 +57,7 @@ bgstarsnum = 100
   -- level = wave, wave, wave
 
 routes = {}
-routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 10}, {0, 1, 10, 10}} -- '^'
+routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 7}, {0.5, 0.7, 7, 10}, {0, 1, 10, 10}} -- '^'
 enemy_types = {}
 
 waves = {}
@@ -110,9 +110,8 @@ function update_wave(dt)
   enemies_left = 0
   for _, enemy in ipairs(active_wave.enemies) do
     enemy.clock = enemy.clock + dt
-    if enemy.clock > active_wave.end_clock then
-      enemy.done = true
-    else
+    if enemy.clock >= 0 and enemy.clock < active_wave.end_clock then
+      enemy.active = true
       enemy.x, enemy.y = pos_on_route(active_wave.route_id, enemy.clock)
       enemy.x = enemy.x * love.graphics.getWidth() + enemy.dx
       enemy.y = enemy.y * love.graphics.getHeight() + enemy.dy
@@ -132,7 +131,7 @@ end
 function draw_wave()
   spr = enemy_types[active_wave.enemy_type].img
   for _, enemy in ipairs(active_wave.enemies) do
-    if not enemy.done then
+    if enemy.active then
       love.graphics.draw(spr, enemy.x, enemy.y,0, 1, 1, spr:getWidth()/2, spr:getHeight()/2)
     end
   end
