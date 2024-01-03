@@ -61,7 +61,7 @@ routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 10}, {0, 1, 10, 10}} -- '^'
 enemy_types = {}
 
 waves = {}
-waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 50, dy = 0 , dt = 1 }
+waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 50, dy = 0 , dt = 0.1 }
 
 function spawn_wave(wave_id)
   active_wave = waves[wave_id]
