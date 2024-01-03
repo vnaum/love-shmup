@@ -51,12 +51,61 @@ blips = {}
 bgstars = {}
 bgstarsnum = 100
 
+  -- route = (x, y, tstamp), (x, y, tstamp), ...
+  -- enemy = wave_id, hitpoints, routetime
+  -- wave = enemy_type, route_id, clock, number + tdelta + xdelta + ydelta
+  -- level = wave, wave, wave
+
+routes = {}
+routes[1] = {{1, 1 , 0}, {0.5, 0, 5}, {0, 1, 10}} -- '^'
+enemy_types = {}
+
+waves = {}
+waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 1 }
+
+function spawn_wave(wave_id)
+  active_wave = waves[wave_id]
+  active_wave.clock = 0
+  active_wave.enemies = {}
+  local dx = 0
+  local dy = 0
+  local dt = 0
+  for i = 1, active_wave.enemy_count do
+    local e = {}
+    e.hp = enemy_types[ active_wave.enemy_type ].hp
+    e.clock = dt
+    e.x = routes[active_wave.route_id][1][1] + dx
+    e.y = routes[active_wave.route_id][1][2] + dy
+    table.insert(active_wave.enemies, e)
+
+    dx = dx + active_wave.dx
+    dy = dy + active_wave.dy
+    dt = dt - active_wave.dt
+  end
+end
+
+function update_wave(dt)
+end
+
+function draw_wave()
+  spr = enemy_types[active_wave.enemy_type].img
+  for _, bullet in ipairs(active_wave.enemies) do
+    love.graphics.draw(spr, 400, 300)
+  end
+end
+
 function love.load()
   love.window.setMode(0, 0, {fullscreen=true})
 
 
   bulletimg = love.graphics.newImage("sprites/bullet.png")
   bulletmid = bulletimg:getWidth() / 2
+
+  -- enemies
+  local enemy = {}
+  enemy.img = love.graphics.newImage("sprites/enemy1.png")
+  enemy.hp = 2
+  table.insert(enemy_types, enemy)
 
   -- stars
   for i = 1, bgstarsnum do
@@ -81,6 +130,8 @@ function love.load()
       blip = love.audio.newSource(file_path, "static")
       table.insert(blips, blip)
     end
+
+    spawn_wave(1)
   end
 
   local player = {}
@@ -106,6 +157,7 @@ function love.load()
   player.img = love.graphics.newImage("sprites/chop2.png")
 
   table.insert(players, player)
+
 end
 
 function love.update(dt)
@@ -118,6 +170,8 @@ function love.update(dt)
       star.y = math.random(0, love.graphics.getHeight())
     end
   end
+
+  update_wave(dt)
 
   -- update bullets
   for i, bullet in ipairs(bullets) do
@@ -207,4 +261,6 @@ function love.draw()
     love.graphics.draw(bulletimg, bullet.x, bullet.y, 0, 1, 1, bulletmid, bulletmid)
     love.graphics.reset()
   end
+
+  draw_wave()
 end
