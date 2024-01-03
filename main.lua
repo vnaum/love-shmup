@@ -57,7 +57,7 @@ bgstarsnum = 100
   -- level = wave, wave, wave
 
 routes = {}
-routes[1] = {{1, 1 , 0}, {0.5, 0, 5}, {0, 1, 10}} -- '^'
+routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 10}, {0, 1, 10, 10}} -- '^'
 enemy_types = {}
 
 waves = {}
@@ -87,6 +87,22 @@ function spawn_wave(wave_id)
 end
 
 function pos_on_route(route_id, t)
+  if t < 0 then
+    return 0, 0
+  end
+  for i, wp in ipairs(routes[route_id]) do
+    if t >= wp[3] and t < wp[4] then
+      -- this is wp1
+      ax, ay = wp[1], wp[2]
+      nextwp = routes[route_id][i+1]
+      bx, by = nextwp[1], nextwp[2]
+
+      x = lerp(ax, bx, inverseLerp(wp[3], nextwp[3], t))
+      y = lerp(ay, by, inverseLerp(wp[3], nextwp[3], t))
+      return x, y
+    end
+  end
+
   return 0.5, 0.5
 end
 
