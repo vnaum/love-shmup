@@ -51,6 +51,8 @@ blips = {}
 bgstars = {}
 bgstarsnum = 100
 
+  -- waypoint: time, x, y
+  -- enriched waypoint: wp + eta + sx + sy
   -- route = (x, y, tstamp), (x, y, tstamp), ...
   -- enemy = wave_id, clock, hitpoints, routetime
   -- wave = enemy_type, route_id, end_clock, number + tdelta + xdelta + ydelta
@@ -237,18 +239,18 @@ function love.update(dt)
   for i, player in ipairs(players) do
     if love.keyboard.isDown(player.control.left) then
       player.sx = limit(player.sx - accelx * dt, termvelx)
-    end
-
-    if love.keyboard.isDown(player.control.right) then
+    elseif love.keyboard.isDown(player.control.right) then
       player.sx = limit(player.sx + accelx * dt, termvelx)
+    else
+      player.sx = player.sx * 0.97
     end
 
     if love.keyboard.isDown(player.control.up) then
       player.sy = limit(player.sy - accelx * dt, termvely)
-    end
-
-    if love.keyboard.isDown(player.control.down) then
+    elseif love.keyboard.isDown(player.control.down) then
       player.sy = limit(player.sy + accelx * dt, termvely)
+    else
+      player.sy = player.sy * 0.97
     end
 
     player.y = player.y + player.sy
