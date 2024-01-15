@@ -242,7 +242,17 @@ function love.update(dt)
     elseif love.keyboard.isDown(player.control.right) then
       player.sx = limit(player.sx + accelx * dt, termvelx)
     else
-      player.sx = player.sx * 0.97
+      if player.sx > 0 then
+        player.sx = player.sx - accelx * dt
+        if player.sx < 0 then
+          player.sx = 0
+        end
+      else
+        player.sx = player.sx + accelx * dt
+        if player.sx > 0 then
+          player.sx = 0
+        end
+      end
     end
 
     if love.keyboard.isDown(player.control.up) then
@@ -250,7 +260,17 @@ function love.update(dt)
     elseif love.keyboard.isDown(player.control.down) then
       player.sy = limit(player.sy + accelx * dt, termvely)
     else
-      player.sy = player.sy * 0.97
+      if player.sy > 0 then
+        player.sy = player.sy - accelx * dt
+        if player.sy < 0 then
+          player.sy = 0
+        end
+      else
+        player.sy = player.sy + accelx * dt
+        if player.sy > 0 then
+          player.sy = 0
+        end
+      end
     end
 
     player.y = player.y + player.sy
