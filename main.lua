@@ -66,8 +66,8 @@ bgstarsnum = 100
   -- level = wave, wave, wave
 
 function route_diag(t)
-  wp1 = {x=1 , y=1, r=0, sx=0, sy=0, kx=0, ky =0}
-  wp2 = {x=0 , y=0, r=0, sx=0, sy=0, kx=0, ky =0}
+  wp1 = {x=1 , y=1, r=0, sx=1, sy=1, kx=0, ky = 0}
+  wp2 = {x=0 , y=0, r=100, sx=2, sy=0.5, kx=0, ky = 0}
   current_coord = wp1
   active = false
   if t >=0 and t < 10 then
@@ -79,8 +79,7 @@ end
 
 
 routes = {}
-routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 7}, {0.5, 0.7, 7, 10}, {0, 1, 10, 10}} -- '^'
-routes[2] = route_diag
+routes[1] = route_diag
 enemy_types = {}
 
 waves = {}
@@ -88,7 +87,6 @@ waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt 
 
 function spawn_wave(wave_id)
   active_wave = waves[wave_id]
-  active_wave.end_clock = routes[active_wave.route_id][ #routes[active_wave.route_id] ] [3]
   active_wave.enemies = {}
   local dx = 0
   local dy = 0
@@ -97,8 +95,7 @@ function spawn_wave(wave_id)
     local e = {}
     e.hp = enemy_types[ active_wave.enemy_type ].hp
     e.clock = dt
-    e.x = routes[active_wave.route_id][1][1]
-    e.y = routes[active_wave.route_id][1][2]
+    e.coord = routes[active_wave.route_id](0)
     e.dx = dx
     e.dy = dy
     e.color = { love.math.colorFromBytes(generateRandomColor()) }
@@ -110,39 +107,17 @@ function spawn_wave(wave_id)
   end
 end
 
-function pos_on_route(route_id, t)
-  if t < 0 then
-    return 0, 0
-  end
-  for i, wp in ipairs(routes[route_id]) do
-    if t >= wp[3] and t < wp[4] then
-      -- this is wp1
-      ax, ay = wp[1], wp[2]
-      nextwp = routes[route_id][i+1]
-      bx, by = nextwp[1], nextwp[2]
-
-      x = lerp(ax, bx, inverseLerp(wp[3], nextwp[3], t))
-      y = lerp(ay, by, inverseLerp(wp[3], nextwp[3], t))
-      return x, y
-    end
-  end
-
-  return 0.5, 0.5
-end
-
 function update_wave(dt)
   enemies_left = 0
   for _, enemy in ipairs(active_wave.enemies) do
     enemy.clock = enemy.clock + dt
-    if enemy.clock >= 0 and enemy.clock < active_wave.end_clock then
-      enemy.active = true
-      enemy.x, enemy.y = pos_on_route(active_wave.route_id, enemy.clock)
-      enemy.x = enemy.x * love.graphics.getWidth() + enemy.dx
-      enemy.y = enemy.y * love.graphics.getHeight() + enemy.dy
-    end
-
-    if enemy.clock < active_wave.end_clock and enemy.hp > 0 then
-      enemies_left = enemies_left + 1
+    enemy.active, enemy.coord = routes[active_wave.route_id](enemy.clock)
+    if enemy.active then
+      enemy.coord.x = enemy.coord.x * love.graphics.getWidth() + enemy.dx
+      enemy.coord.y = enemy.coord.y * love.graphics.getHeight() + enemy.dy
+      if enemy.hp > 0 then
+        enemies_left = enemies_left + 1
+      end
     end
   end
 
@@ -154,10 +129,13 @@ end
 
 function draw_wave()
   spr = enemy_types[active_wave.enemy_type].img
-  for _, enemy in ipairs(active_wave.enemies) do
+  for i, enemy in ipairs(active_wave.enemies) do
     if enemy.active then
+      if i == 1 then
+        love.graphics.print('enemyx: '.. enemy.coord.y)
+      end
       love.graphics.setColor(enemy.color)
-      love.graphics.draw(spr, enemy.x, enemy.y,0, 1, 1, spr:getWidth()/2, spr:getHeight()/2)
+      love.graphics.draw(spr, enemy.coord.x, enemy.coord.y, enemy.coord.r, enemy.coord.sx, enemy.coord.sy, spr:getWidth()/2, spr:getHeight()/2, enemy.coord.kx, enemy.coord.ky)
       love.graphics.reset()
     end
   end
