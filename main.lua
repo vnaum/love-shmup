@@ -1,6 +1,13 @@
-
 function lerp(a,b,t)
   return a * (1-t) + b * t
+end
+
+function tablerp(aa, bb, t)
+  res = {}
+  for i, v in pairs(aa) do
+    res[i] = lerp(v, bb[i], t)
+  end
+  return res
 end
 
 function inverseLerp(a, b, x)
