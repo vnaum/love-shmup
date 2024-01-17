@@ -65,8 +65,22 @@ bgstarsnum = 100
   -- wave = enemy_type, route_id, end_clock, number + tdelta + xdelta + ydelta
   -- level = wave, wave, wave
 
+function route_diag(t)
+  wp1 = {x=1 , y=1, r=0, sx=0, sy=0, kx=0, ky =0}
+  wp2 = {x=0 , y=0, r=0, sx=0, sy=0, kx=0, ky =0}
+  current_coord = wp1
+  active = false
+  if t >=0 and t < 10 then
+    active = true
+    current_coord = tablerp(wp1, wp2, t/10)
+  end
+  return active, current_coord
+end
+
+
 routes = {}
 routes[1] = {{1, 1 , 0, 5}, {0.5, 0, 5, 7}, {0.5, 0.7, 7, 10}, {0, 1, 10, 10}} -- '^'
+routes[2] = route_diag
 enemy_types = {}
 
 waves = {}
