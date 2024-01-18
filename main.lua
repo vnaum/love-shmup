@@ -80,6 +80,7 @@ function secondaty_circle(t)
   ug = 2 * math.pi * t / per
   res.x = math.cos(ug) * r
   res.y = math.sin(ug) * r
+  res.sx = 1 + math.sin(ug)
   return res
 end
 
