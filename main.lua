@@ -10,6 +10,14 @@ function tablerp(aa, bb, t)
   return res
 end
 
+function tabsum(aa, bb)
+  res = {}
+  for i, v in pairs(aa) do
+    res[i] = v + bb[i]
+  end
+  return res
+end
+
 function inverseLerp(a, b, x)
   return (x-a)/(b-a)
 end
@@ -65,9 +73,19 @@ bgstarsnum = 100
   -- wave = enemy_type, route_id, end_clock, number + tdelta + xdelta + ydelta
   -- level = wave, wave, wave
 
+function secondaty_circle(t)
+  res = {x=1 , y=1, r=0, sx=0, sy=0, kx=0, ky = 0}
+  r=0.2
+  per = 3
+  ug = 2 * math.pi * t / per
+  res.x = math.cos(ug) * r
+  res.y = math.sin(ug) * r
+  return res
+end
+
 function route_diag(t)
   wp1 = {x=1 , y=1, r=0, sx=1, sy=1, kx=0, ky = 0}
-  wp2 = {x=0 , y=0, r=100, sx=2, sy=0.5, kx=0, ky = 0}
+  wp2 = {x=0 , y=0, r=100, sx=1, sy=1, kx=0, ky = 0}
   current_coord = wp1
   active = false
   if t >=0 and t < 10 then
@@ -79,7 +97,7 @@ end
 
 
 routes = {}
-routes[1] = route_diag
+routes[1] = { route_diag, secondaty_circle }
 enemy_types = {}
 
 waves = {}
@@ -95,7 +113,7 @@ function spawn_wave(wave_id)
     local e = {}
     e.hp = enemy_types[ active_wave.enemy_type ].hp
     e.clock = dt
-    e.coord = routes[active_wave.route_id](0)
+    -- e.coord = routes[active_wave.route_id][1](0) +
     e.dx = dx
     e.dy = dy
     e.color = { love.math.colorFromBytes(generateRandomColor()) }
@@ -111,7 +129,8 @@ function update_wave(dt)
   enemies_left = 0
   for _, enemy in ipairs(active_wave.enemies) do
     enemy.clock = enemy.clock + dt
-    enemy.active, enemy.coord = routes[active_wave.route_id](enemy.clock)
+    enemy.active, enemy.coord = routes[active_wave.route_id][1](enemy.clock)
+    enemy.coord = tabsum(enemy.coord, routes[active_wave.route_id][2](enemy.clock))
     if enemy.active then
       enemy.coord.x = enemy.coord.x * love.graphics.getWidth() + enemy.dx
       enemy.coord.y = enemy.coord.y * love.graphics.getHeight() + enemy.dy
