@@ -152,7 +152,7 @@ function draw_wave()
   for i, enemy in ipairs(active_wave.enemies) do
     if enemy.active then
       if i == 1 then
-        love.graphics.print('enemyx: '.. enemy.coord.y)
+        love.graphics.print('Number of bullets: \n'.. #bullets)
       end
       love.graphics.setColor(enemy.color)
       love.graphics.draw(spr, enemy.coord.x, enemy.coord.y, enemy.coord.r, enemy.coord.sx, enemy.coord.sy, spr:getWidth()/2, spr:getHeight()/2, enemy.coord.kx, enemy.coord.ky)
@@ -245,12 +245,8 @@ function love.update(dt)
     bullet.y = bullet.y + bullet.sy
     bullet.x = bullet.x + bullet.sx
     -- screen boundaries
-    if bullet.y < 0 or bullet.y > love.graphics.getHeight() then
-      bullet.sy = -bullet.sy
-    end
-
-    if bullet.x < 0 or bullet.x > love.graphics.getWidth() then
-      bullet.sx = -bullet.sx
+    if bullet.y < 0 or bullet.y > love.graphics.getHeight() or bullet.x < 0 or bullet.x > love.graphics.getWidth() then
+      bullet.DELETE = true
     end
   end
 
@@ -328,6 +324,15 @@ function love.update(dt)
       player.cooldown_left = player.cooldown_left - dt
     end
   end
+
+  -- delete inactives
+
+  for i = #bullets, 1, -1 do
+    if bullets[i].DELETE then
+      table.remove(bullets, i)
+    end
+  end
+
 end
 
 function love.draw()
