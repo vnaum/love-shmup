@@ -152,7 +152,7 @@ function draw_wave()
   for i, enemy in ipairs(active_wave.enemies) do
     if enemy.active then
       if i == 1 then
-        love.graphics.print('Number of bullets: \n'.. #bullets)
+        love.graphics.print('Number of bullets: '.. #bullets .. "\nNumber of enemies: " .. #active_wave.enemies)
       end
       love.graphics.setColor(enemy.color)
       love.graphics.draw(spr, enemy.coord.x, enemy.coord.y, enemy.coord.r, enemy.coord.sx, enemy.coord.sy, spr:getWidth()/2, spr:getHeight()/2, enemy.coord.kx, enemy.coord.ky)
@@ -162,6 +162,8 @@ function draw_wave()
 end
 
 function love.load()
+  love.graphics.setDefaultFilter( "nearest" )
+
   love.window.setMode(0, 0, {fullscreen=true})
 
 
