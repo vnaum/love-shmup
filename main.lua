@@ -113,6 +113,9 @@ function spawn_wave(wave_id)
   for i = 1, active_wave.enemy_count do
     local e = {}
     e.hp = enemy_types[ active_wave.enemy_type ].hp
+    e.half_width = enemy_types[ active_wave.enemy_type ].half_width
+    e.half_height = enemy_types[ active_wave.enemy_type ].half_height
+
     e.clock = dt
     -- e.coord = routes[active_wave.route_id][1](0) +
     e.dx = dx
@@ -138,6 +141,14 @@ function update_wave(dt)
       if enemy.hp > 0 then
         enemies_left = enemies_left + 1
       end
+
+      -- update bullets
+      for i, bullet in ipairs(bullets) do
+        if math.abs(bullet.x - enemy.coord.x) < enemy.half_width and math.abs(bullet.y - enemy.coord.y) < enemy.half_height then
+          bullet.DELETE = true
+          enemy.DELETE = true
+        end
+      end
     end
   end
 
@@ -155,7 +166,7 @@ function draw_wave()
         love.graphics.print('Number of bullets: '.. #bullets .. "\nNumber of enemies: " .. #active_wave.enemies)
       end
       love.graphics.setColor(enemy.color)
-      love.graphics.draw(spr, enemy.coord.x, enemy.coord.y, enemy.coord.r, enemy.coord.sx, enemy.coord.sy, spr:getWidth()/2, spr:getHeight()/2, enemy.coord.kx, enemy.coord.ky)
+      love.graphics.draw(spr, enemy.coord.x, enemy.coord.y, enemy.coord.r, enemy.coord.sx, enemy.coord.sy, enemy.half_width, enemy.half_height, enemy.coord.kx, enemy.coord.ky)
       love.graphics.reset()
     end
   end
@@ -174,6 +185,8 @@ function love.load()
   local enemy = {}
   enemy.img = love.graphics.newImage("sprites/enemy1.png")
   enemy.hp = 2
+  enemy.half_width = enemy.img:getWidth()/2
+  enemy.half_height = enemy.img:getHeight()/2
   table.insert(enemy_types, enemy)
 
   -- stars
@@ -240,7 +253,6 @@ function love.update(dt)
     end
   end
 
-  update_wave(dt)
 
   -- update bullets
   for i, bullet in ipairs(bullets) do
@@ -251,6 +263,8 @@ function love.update(dt)
       bullet.DELETE = true
     end
   end
+
+  update_wave(dt)
 
   -- update players
   for i, player in ipairs(players) do
@@ -332,6 +346,12 @@ function love.update(dt)
   for i = #bullets, 1, -1 do
     if bullets[i].DELETE then
       table.remove(bullets, i)
+    end
+  end
+
+  for i = #active_wave.enemies, 1, -1 do
+    if active_wave.enemies[i].DELETE then
+      table.remove(active_wave.enemies, i)
     end
   end
 
