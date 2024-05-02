@@ -120,7 +120,7 @@ routes[2] = { route_diag2, secondary_nop }
 enemy_types = {}
 
 waves = {}
-waves[1] = { enemy_type = 2, enemy_count = 5, route_id = 2, dx = 0, dy = 0 , dt = 0.5 }
+waves[1] = { enemy_type = 3, enemy_count = 5, route_id = 2, dx = 0, dy = 0 , dt = 0.5 }
 waves[2] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 0.1 }
 
 function spawn_wave(wave_id)
@@ -201,7 +201,6 @@ function love.load()
 
   love.window.setMode(0, 0, {fullscreen=true})
 
-
   bulletimg = love.graphics.newImage("sprites/fireball.png")
   bulletmid = bulletimg:getWidth() / 2
 
@@ -219,6 +218,14 @@ function love.load()
   enemy.half_width = enemy.img:getWidth()/2
   enemy.half_height = enemy.img:getHeight()/2
   table.insert(enemy_types, enemy)
+
+  local enemy = {}
+  enemy.img = love.graphics.newImage("sprites/enemy-ship.png")
+  enemy.hp = 2
+  enemy.half_width = enemy.img:getWidth()/2
+  enemy.half_height = enemy.img:getHeight()/2
+  table.insert(enemy_types, enemy)
+
 
   -- stars
   for i = 1, bgstarsnum do
@@ -389,6 +396,10 @@ function love.update(dt)
 end
 
 function love.draw()
+  -- set background color to #84C1EE (132, 193, 238)
+  local r, g, b = love.math.colorFromBytes(32, 0, 32)
+  love.graphics.clear(r, g, b, 1)
+
   -- love.graphics.print('sx: '.. players[1].sx)
 
   for _, star in ipairs(bgstars) do
