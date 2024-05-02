@@ -73,7 +73,7 @@ bgstarsnum = 100
   -- wave = enemy_type, route_id, end_clock, number + tdelta + xdelta + ydelta
   -- level = wave, wave, wave
 
-function secondaty_circle(t)
+function secondary_circle(t)
   res = {x=1 , y=1, r=0, sx=0, sy=0, kx=0, ky = 0}
   r=0.2
   per = 3
@@ -81,6 +81,11 @@ function secondaty_circle(t)
   res.x = math.cos(ug) * r
   res.y = math.sin(ug) * r
   res.sx = 1 + math.sin(ug)
+  return res
+end
+
+function secondary_nop(t)
+  res = {x=0 , y=0, r=0, sx=0, sy=0, kx=0, ky = 0}
   return res
 end
 
@@ -96,13 +101,27 @@ function route_diag(t)
   return active, current_coord
 end
 
+function route_diag2(t)
+  wp1 = {x=1 , y=0, r=0, sx=1, sy=1, kx=0, ky = 0}
+  wp2 = {x=0 , y=1, r=0, sx=1, sy=1, kx=0, ky = 0}
+  current_coord = wp1
+  active = false
+  if t >=0 and t < 10 then
+    active = true
+    current_coord = tablerp(wp1, wp2, t/10)
+  end
+  return active, current_coord
+end
+
 
 routes = {}
-routes[1] = { route_diag, secondaty_circle }
+routes[1] = { route_diag, secondary_circle }
+routes[2] = { route_diag2, secondary_nop }
 enemy_types = {}
 
 waves = {}
-waves[1] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 0.1 }
+waves[1] = { enemy_type = 2, enemy_count = 5, route_id = 2, dx = 0, dy = 0 , dt = 0.5 }
+waves[2] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 0.1 }
 
 function spawn_wave(wave_id)
   active_wave = waves[wave_id]
@@ -184,6 +203,13 @@ function love.load()
   -- enemies
   local enemy = {}
   enemy.img = love.graphics.newImage("sprites/enemy1.png")
+  enemy.hp = 2
+  enemy.half_width = enemy.img:getWidth()/2
+  enemy.half_height = enemy.img:getHeight()/2
+  table.insert(enemy_types, enemy)
+
+  local enemy = {}
+  enemy.img = love.graphics.newImage("sprites/rob-charact.png")
   enemy.hp = 2
   enemy.half_width = enemy.img:getWidth()/2
   enemy.half_height = enemy.img:getHeight()/2
