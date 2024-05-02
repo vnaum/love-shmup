@@ -124,6 +124,7 @@ waves[1] = { enemy_type = 2, enemy_count = 5, route_id = 2, dx = 0, dy = 0 , dt 
 waves[2] = { enemy_type = 1, enemy_count = 3, route_id = 1, dx = 0, dy = 0 , dt = 0.1 }
 
 function spawn_wave(wave_id)
+  active_wave_id = wave_id
   active_wave = waves[wave_id]
   active_wave.enemies = {}
   local dx = 0
@@ -173,7 +174,11 @@ function update_wave(dt)
 
   -- we're done with wave 1
   if enemies_left == 0 then
-    spawn_wave (1)
+    next_wave = active_wave_id + 1
+    if next_wave > #waves then
+      next_wave = 1
+    end
+    spawn_wave (next_wave)
   end
 end
 
