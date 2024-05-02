@@ -202,7 +202,7 @@ function love.load()
   love.window.setMode(0, 0, {fullscreen=true})
 
 
-  bulletimg = love.graphics.newImage("sprites/bullet.png")
+  bulletimg = love.graphics.newImage("sprites/fireball.png")
   bulletmid = bulletimg:getWidth() / 2
 
   -- enemies
